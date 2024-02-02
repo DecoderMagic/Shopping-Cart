@@ -184,6 +184,22 @@ def updateProfile():
                     msg = "Error occured"
         con.close()
         return redirect(url_for('editProfile'))
+@app.route("/account/profile/delete", methods=["GET","POST"])
+def deleteProfile():
+    if 'email' in session:
+        email = session['email']
+        with sqlite3.connect('database.db') as con:
+            try:
+                cur = con.cursor()
+                cur.execute('DELETE FROM users WHERE email = ?', (email,))
+                con.commit()
+                session.pop('email', None)  # Remove email from session
+                return redirect(url_for('root'))
+            except:
+                con.rollback()
+                return "Error occurred while deleting profile"
+    else:
+        return redirect(url_for('loginForm'))
 
 @app.route("/loginForm")
 def loginForm():
